@@ -30,9 +30,15 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--release"
           strip: true
-      - name: Publish artifacts and release
+      - name: Publish artifacts
         uses: houseabsolute/actions-rust-release@v0
         with:
           executable-name: disk-watcher
           target: ${{ matrix.platform.target }}
           release-tag-prefix: ""
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/${{ matrix.platform.target }}/release/disk-watcher
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
