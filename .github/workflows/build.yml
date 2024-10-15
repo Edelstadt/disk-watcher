@@ -36,18 +36,15 @@ jobs:
           executable-name: disk-watcher
           target: ${{ matrix.platform.target }}
           release-tag-prefix: ""
-      - name: Tag the repository
-        id: tag
-        run: |
-          # See https://docs.github.com/en/get-started/using-git/dealing-with-special-characters-in-branch-and-tag-names
-          TAG=v$(date -Iseconds | sed 's/[T:\+]/-/g')
-          echo "$TAG"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          git tag -a $TAG -m "Published version $TAG" ${GITHUB_SHA}
-          git push origin $TAG
+      - name: Bump version and push tag
+        id: bump
+        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+          WITH_V: false
       - name: Release
         uses: softprops/action-gh-release@v2.0.8
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
         env:
-          GITHUB_TOKEN: ${{ steps.tag.outputs.tag }}
+          GITHUB_TOKEN: ${{ steps.bump.outputs.new_tag }}
