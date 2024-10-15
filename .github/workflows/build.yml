@@ -25,6 +25,7 @@ jobs:
         id: generate_tag
         run: |
           TAG="0.$(date +'%Y%m%d%H%M')"
+          echo "TAG=${TAG}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build binary
@@ -44,6 +45,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
-          tag_name: ${{ steps.generate_tag.outputs.TAG }}
+          tag_name: ${{ env.generate_tag.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
