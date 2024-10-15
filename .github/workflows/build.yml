@@ -6,19 +6,7 @@ on:
       - main  # Spustí se při push do hlavní větve
 
 jobs:
-  generate-tag:
-    name: Generate tag
-    runs-on: ubuntu-20.04
-    outputs:
-        TAG: ${{ steps.generate_tag.outputs.TAG }}
-    steps:
-      - name: Generate tag
-        id: generate_tag
-        run: |
-          TAG="0.$(date +'%Y%m%d%H%M')"
-          echo "TAG=${TAG}" >> $GITHUB_ENV
   release:
-    needs: [generate-tag]
     name: Release - ${{ matrix.platform.os-name }}
     strategy:
       matrix:
@@ -48,10 +36,14 @@ jobs:
           executable-name: disk-watcher
           target: ${{ matrix.platform.target }}
           release-tag-prefix: ""
+      - name: Generate tag
+        id: generate-tag
+        run: |
+          echo "::set-output name=release_tag::0.$(date +"%Y.%m.%d_%H-%M")"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
-          tag_name: ${{ needs.generate-tag.outputs.TAG }}
+          tag_name: ${{ steps.generate-tag.outputs.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
