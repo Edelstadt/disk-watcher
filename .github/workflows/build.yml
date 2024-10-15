@@ -6,50 +6,32 @@ on:
       - main  # Spustí se při push do hlavní větve
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    name: Release - ${{ matrix.platform.os-name }}
+    strategy:
+      matrix:
+        platform:
+          - os-name: Linux-x86_64
+            runs-on: ubuntu-20.04
+            target: x86_64-unknown-linux-musl
 
+          - os-name: Linux-aarch64
+            runs-on: ubuntu-20.04
+            target: aarch64-unknown-linux-musl
+
+    runs-on: ${{ matrix.platform.runs-on }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v0
         with:
-          toolchain: stable
-          override: true
-          cache: cargo
-
-      - name: Build
-        run: cargo build --release
-
-      - name: Run tests
-        run: cargo test --release
-
-      - name: Generate tag
-        id: generate_tag
-        run: |
-          TAG="0.$(date +'%Y%m%d%H%M')"
-          echo "TAG=${TAG}" >> $GITHUB_ENV
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
+          command: ${{ matrix.platform.command }}
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
+          strip: true
+      - name: Publish artifacts and release
+        uses: houseabsolute/actions-rust-release@v0
         with:
-          tag_name: ${{ env.TAG }}  # Použije vygenerovaný tag pro release
-          name: Release ${{ env.TAG }}
-          body: |
-            This is a release for version ${{ env.TAG }}.
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload release assets
-        if: steps.create_release.outputs.id != ''
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.TAG }}
-          files: target/release/disk-watcher
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          binary-name: ubi
+          target: ${{ matrix.platform.target }}
