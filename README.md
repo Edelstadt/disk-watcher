@@ -40,6 +40,25 @@ export WATCHER_COUNT="5"
 export DB_PATH="/home/user/data.sqlite"
 ./disk-watcher
 ```
+## Struktura databáze
+
+Aplikace používá SQLite databázi k ukládání informací o největších složkách a záznamu o průběhu skenování. Databáze obsahuje následující dvě tabulky:
+
+#### Tabulka: `largest_folders`
+
+Tato tabulka uchovává informace o největších nalezených složkách během procesu skenování.
+
+- **dir** (`TEXT`): Cesta ke složce.
+- **size** (`INTEGER`): Velikost složky v bytech.
+
+#### Tabulka: `scrape_log`
+
+Tato tabulka zaznamenává čas, kdy bylo skenování provedeno, a jak dlouho trvalo.
+
+- **timestamp** (`TEXT`): Čas, kdy skenování začalo. Automaticky se nastavuje na aktuální čas.
+- **elapsed** (`TEXT`): Čas, který zabralo dokončení skenování.
+
+Tyto tabulky slouží k sledování a analýze procesu skenování, poskytují přehled o tom, které složky jsou největší, a jak dlouho jednotlivé skenování trvá.
 
 ## Logování
 
