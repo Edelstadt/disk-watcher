@@ -21,6 +21,10 @@ jobs:
 
     runs-on: ${{ matrix.platform.runs-on }}
     steps:
+      - name: Generate tag
+        id: generate_tag
+        run: |
+          TAG="0.$(date +'%Y%m%d%H%M')"
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build binary
@@ -40,6 +44,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ steps.generate_tag.outputs.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
