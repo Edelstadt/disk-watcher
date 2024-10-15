@@ -35,3 +35,4 @@ jobs:
         with:
           executable-name: disk-watcher
           target: ${{ matrix.platform.target }}
+          release-tag-prefix: ""
