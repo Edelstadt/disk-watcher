@@ -46,6 +46,6 @@ jobs:
         uses: softprops/action-gh-release@v2.0.8
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
-          tag_name: ${{ steps.bump.outputs.new_tag }}
+          tag_name: ${{ steps.bump.outputs.new_tag }}-linux-${{ matrix.platform.os-name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
