@@ -1,0 +1,55 @@
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - main  # Spustí se při push do hlavní větve
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          cache: cargo
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Run tests
+        run: cargo test --release
+
+      - name: Generate tag
+        id: generate_tag
+        run: |
+          TAG="0.$(date +'%Y%m%d%H%M')"
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG }}  # Použije vygenerovaný tag pro release
+          release_name: Release ${{ env.TAG }}
+          body: |
+            This is a release for version ${{ env.TAG }}.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release assets
+        if: steps.create_release.outputs.id != ''
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG }}
+          files: target/release/your_binary_name  # Změňte na název vaší binární aplikace
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
