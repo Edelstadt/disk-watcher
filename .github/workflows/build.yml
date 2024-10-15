@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "::set-output name=release_tag::0.$(date +"%Y.%m.%d_%H-%M")"
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.0.8
         with:
           files: target/${{ matrix.platform.target }}/release/disk-watcher
         env:
