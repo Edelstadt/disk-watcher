@@ -34,10 +34,10 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}  # Použije vygenerovaný tag pro release
-          release_name: Release ${{ env.TAG }}
+          name: Release ${{ env.TAG }}
           body: |
             This is a release for version ${{ env.TAG }}.
           draft: false
@@ -50,6 +50,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG }}
-          files: target/release/your_binary_name  # Změňte na název vaší binární aplikace
+          files: target/release/disk-watcher
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
